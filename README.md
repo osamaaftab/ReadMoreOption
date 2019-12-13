@@ -23,7 +23,7 @@ Convert your TextView in ExpandableTextView with added options ReadMore/ReadLess
 #### Step 2. Add the dependency
 ```gradle
     dependencies {
-        implementation 'com.github.devendroid:ReadMoreOption:1.0.2'
+        implementation 'com.github.devendroid:ReadMoreOption:1.0.3'
      }
 
 ```
