@@ -18,6 +18,7 @@ package com.devs.readmoreoption;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Handler;
 import android.text.Spannable;
@@ -52,8 +53,9 @@ public class ReadMoreOption {
     private int lessLabelColor;
     private boolean labelUnderLine;
     private boolean expandAnimation;
+    private boolean labelBold;
 
-    private ReadMoreOption(Builder builder){
+    private ReadMoreOption(Builder builder) {
         this.context = builder.context;
         this.textLength = builder.textLength;
         this.textLengthType = builder.textLengthType;
@@ -63,16 +65,16 @@ public class ReadMoreOption {
         this.lessLabelColor = builder.lessLabelColor;
         this.labelUnderLine = builder.labelUnderLine;
         this.expandAnimation = builder.expandAnimation;
+        this.labelBold = builder.labelBold;
     }
 
-    public void addReadMoreTo(final TextView textView, final CharSequence text){
-        if(textLengthType==TYPE_CHARACTER) {
+    public void addReadMoreTo(final TextView textView, final CharSequence text) {
+        if (textLengthType == TYPE_CHARACTER) {
             if (text.length() <= textLength) {
                 textView.setText(text);
                 return;
             }
-        }
-        else {
+        } else {
             // If TYPE_LINE
             textView.setLines(textLength);
             textView.setText(text);
@@ -84,7 +86,7 @@ public class ReadMoreOption {
 
                 int textLengthNew = textLength;
 
-                if(textLengthType==TYPE_LINE) {
+                if (textLengthType == TYPE_LINE) {
 
 
                     if (textView.getLayout().getLineCount() <= textLength) {
@@ -96,7 +98,7 @@ public class ReadMoreOption {
 
                     String subString = text.toString().substring(textView.getLayout().getLineStart(0),
                             textView.getLayout().getLineEnd(textLength - 1));
-                    textLengthNew = subString.length() - (moreLabel.length()+4+(lp.rightMargin/6));
+                    textLengthNew = subString.length() - (moreLabel.length() + 4 + (lp.rightMargin / 6));
                 }
 
                 SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text.subSequence(0, textLengthNew))
@@ -109,19 +111,24 @@ public class ReadMoreOption {
                     public void onClick(View view) {
                         addReadLess(textView, text);
                     }
+
                     @Override
                     public void updateDrawState(TextPaint ds) {
                         super.updateDrawState(ds);
                         ds.setUnderlineText(labelUnderLine);
+
+                        if (labelBold) {
+                            ds.setTypeface(Typeface.DEFAULT_BOLD);
+                        }
                         ds.setColor(moreLabelColor);
                     }
                 };
-                ss.setSpan(clickableSpan, ss.length() - moreLabel.length(), ss.length() , Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ss.setSpan(clickableSpan, ss.length() - moreLabel.length(), ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && expandAnimation) {
                     LayoutTransition layoutTransition = new LayoutTransition();
                     layoutTransition.enableTransitionType(LayoutTransition.CHANGING);
-                    ((ViewGroup)textView.getParent()).setLayoutTransition(layoutTransition);
+                    ((ViewGroup) textView.getParent()).setLayoutTransition(layoutTransition);
                 }
 
                 textView.setText(ss);
@@ -148,14 +155,18 @@ public class ReadMoreOption {
                     }
                 });
             }
+
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
                 ds.setUnderlineText(labelUnderLine);
+                if (labelBold) {
+                    ds.setTypeface(Typeface.DEFAULT_BOLD);
+                }
                 ds.setColor(lessLabelColor);
             }
         };
-        ss.setSpan(clickableSpan, ss.length() - lessLabel.length(), ss.length() , Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(clickableSpan, ss.length() - lessLabel.length(), ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         textView.setText(ss);
         textView.setMovementMethod(LinkMovementMethod.getInstance());
     }
@@ -169,49 +180,55 @@ public class ReadMoreOption {
         private String moreLabel = "read more";
         private String lessLabel = "read less";
         private int moreLabelColor = Color.parseColor("#ff00ff");
-        private int lessLabelColor =  Color.parseColor("#ff00ff");
+        private int lessLabelColor = Color.parseColor("#ff00ff");
         private boolean labelUnderLine = false;
         private boolean expandAnimation = false;
+        private boolean labelBold = false;
 
-        public Builder(Context context){
+        public Builder(Context context) {
             this.context = context;
         }
 
         /**
-         * @param length can be no. of line OR no. of characters - default is 100 character
+         * @param length         can be no. of line OR no. of characters - default is 100 character
          * @param textLengthType ReadMoreOption.TYPE_LINE for no. of line OR
          *                       ReadMoreOption.TYPE_CHARACTER for no. of character
          *                       - default is ReadMoreOption.TYPE_CHARACTER
          * @return Builder obj
          */
-        public Builder textLength(int length, int textLengthType){
+        public Builder textLength(int length, int textLengthType) {
             this.textLength = length;
             this.textLengthType = textLengthType;
             return this;
         }
 
-        public Builder moreLabel(String moreLabel){
+        public Builder moreLabel(String moreLabel) {
             this.moreLabel = moreLabel;
             return this;
         }
 
-        public Builder lessLabel(String lessLabel){
+        public Builder lessLabel(String lessLabel) {
             this.lessLabel = lessLabel;
             return this;
         }
 
-        public Builder moreLabelColor(int moreLabelColor){
+        public Builder moreLabelColor(int moreLabelColor) {
             this.moreLabelColor = moreLabelColor;
             return this;
         }
 
-        public Builder lessLabelColor(int lessLabelColor){
+        public Builder lessLabelColor(int lessLabelColor) {
             this.lessLabelColor = lessLabelColor;
             return this;
         }
 
-        public Builder labelUnderLine(boolean labelUnderLine){
+        public Builder labelUnderLine(boolean labelUnderLine) {
             this.labelUnderLine = labelUnderLine;
+            return this;
+        }
+
+        public Builder labelBold(boolean labelBold) {
+            this.labelBold = labelBold;
             return this;
         }
 
@@ -220,12 +237,12 @@ public class ReadMoreOption {
          *                        - default is false
          * @return Builder obj
          */
-        public Builder expandAnimation(boolean expandAnimation){
+        public Builder expandAnimation(boolean expandAnimation) {
             this.expandAnimation = expandAnimation;
             return this;
         }
 
-        public ReadMoreOption build(){
+        public ReadMoreOption build() {
             return new ReadMoreOption(this);
         }
 
